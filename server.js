@@ -1,6 +1,8 @@
 var express = require('express');
 var request = require('request');
 var cheerio = require('cheerio');
+var json2xls = require('json2xls');
+var fs = require('fs');
 var app = express();
 
 app.use(function (req, res, next) {
@@ -27,8 +29,17 @@ app.get('/scrape', function(req,res){
             var plantDiseases = {
                 DiseaseName: name,
                 ImageLink: imgLink
-            }
+            };
             tempArr.push(plantDiseases);
+        });
+
+        var xls = json2xls(tempArr);
+
+        //Write extracted data to output.xlsx file with the help of json2xls library.
+        fs.writeFileSync('output.xlsx', xls, 'binary', function(err){
+            if (err) {
+                console.log("Error in writing file.");
+            }
         });
         res.status(200).send(tempArr); // Display extracted data in the form of array of json objects.
         }
